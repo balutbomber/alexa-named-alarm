@@ -1,0 +1,31 @@
+app: alexa-named-alarm
+service: alexa-named-alarm
+
+frameworkVersion: '4'
+
+provider:
+  environment:
+    DYNAMODB_REGION: ${aws:region}
+    DYNAMODB_TABLE: ${self:service}-users-${sls:stage}
+  iam:
+    role:
+      statements:
+      - Effect: 'Allow'
+        Action:
+        - 'dynamodb:CreateTable'
+        - 'dynamodb:PutItem'
+        - 'dynamodb:Get*'
+        - 'dynamodb:Scan*'
+        - 'dynamodb:UpdateItem'
+        - 'dynamodb:DeleteItem'
+        Resource: arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/${self:service}-users-${sls:stage}
+  name: aws
+  region: us-east-1
+  runtime: nodejs20.x
+  stage: dev
+
+functions:
+  handler:
+    handler: index.handler
+    events:
+    - alexaSkill: ${param:alexaSkillId}
